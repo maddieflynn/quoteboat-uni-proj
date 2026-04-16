@@ -21,7 +21,7 @@ public class SectionController : ControllerBase
     [HttpGet("sections/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<SectionDto>> GetSection(int id)
+    public async Task<ActionResult<SectionReadDto>> GetSection(int id)
     {
         var section = await _sectionService.GetSectionById(id);
         if (section == null)
@@ -33,7 +33,7 @@ public class SectionController : ControllerBase
 
     [HttpGet("quotes/{id}/sections")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<SectionDto>>> GetSectionsByQuote(int id)
+    public async Task<ActionResult<List<SectionReadDto>>> GetSectionsByQuote(int id)
     {
         var sections = await _sectionService.GetSectionsByQuoteId(id);
         return Ok(sections);
@@ -42,7 +42,7 @@ public class SectionController : ControllerBase
     [HttpPost("quotes/{id}/sections")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<SectionDto>> AddSection(int id, SectionDto dto)
+    public async Task<ActionResult<SectionCreateUpdateDto>> AddSection(int id, SectionCreateUpdateDto dto)
     {
         var created = await _sectionService.AddSectionToQuote(id, dto);
         if (created == null)
@@ -55,7 +55,7 @@ public class SectionController : ControllerBase
     [HttpPut("sections/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<SectionDto>> UpdateSection(int id, SectionDto dto)
+    public async Task<ActionResult<SectionCreateUpdateDto>> UpdateSection(int id, SectionCreateUpdateDto dto)
     {
         var updated = await _sectionService.UpdateSection(id, dto);
         if (updated == null)

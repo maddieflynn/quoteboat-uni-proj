@@ -19,36 +19,41 @@ public class SectionService
         _quoteRepository = quoteRepository;
     }
 
-    public async Task<SectionDto?> GetSectionById(int id)
+    public async Task<SectionReadDto?> GetSectionById(int id)
     {
         var section = await _sectionRepository.GetSectionById(id);
         if (section == null)
         {
             return null;
         }
-        return new SectionDto
+
+        return new SectionReadDto
         {
+            SectionId = section.SectionId,
             Type = section.Type,
             Name = section.Name
         };
     }
 
-    public async Task<List<SectionDto>> GetSectionsByQuoteId(int quoteId)
+    public async Task<List<SectionReadDto>> GetSectionsByQuoteId(int quoteId)
     {
         var sections = await _sectionRepository.GetSectionByQuoteId(quoteId);
-        var result = new List<SectionDto>();
+        var result = new List<SectionReadDto>();
+
         foreach (var s in sections)
         {
-            result.Add(new SectionDto
+            result.Add(new SectionReadDto
             {
+                SectionId = s.SectionId,
                 Type = s.Type,
                 Name = s.Name
             });
         }
+
         return result;
     }
 
-    public async Task<SectionDto?> AddSectionToQuote(int quoteId, SectionDto dto)
+    public async Task<SectionCreateUpdateDto?> AddSectionToQuote(int quoteId, SectionCreateUpdateDto dto)
     {
         var quote = await _quoteRepository.GetQuoteById(quoteId);
         // cannot add section to a non-existent quote
@@ -65,14 +70,14 @@ public class SectionService
             Name = dto.Name
         };
         var created = await _sectionRepository.CreateSection(section);
-        return new SectionDto
+        return new SectionCreateUpdateDto
         {
             Type = created.Type,
             Name = created.Name
         };
     }
 
-    public async Task<SectionDto?> UpdateSection(int id, SectionDto dto)
+    public async Task<SectionCreateUpdateDto?> UpdateSection(int id, SectionCreateUpdateDto dto)
     {
         var existing = await _sectionRepository.GetSectionById(id);
         if (existing == null)
@@ -88,7 +93,7 @@ public class SectionService
         existing.Type = dto.Type;
         existing.Name = dto.Name;
         var updated = await _sectionRepository.UpdateSection(existing);
-        return new SectionDto
+        return new SectionCreateUpdateDto
         {
             Type = updated.Type,
             Name = updated.Name

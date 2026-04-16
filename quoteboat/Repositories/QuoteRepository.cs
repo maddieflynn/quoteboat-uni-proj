@@ -32,7 +32,7 @@ public class QuoteRepository : IQuoteRepository
 
     public async Task<List<Quote>> GetAllQuotes(string? filter, string? sort)
     {
-        var query = _context.Quotes;
+        IQueryable<Quote> query = _context.Quotes;
         // can filter by QuoteNumber, State, and Client name (accessible by the ClientId FK)
         if (!string.IsNullOrEmpty(filter))
         {

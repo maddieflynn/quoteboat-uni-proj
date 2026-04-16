@@ -105,7 +105,7 @@ public class QuoteService
         // allows for 100,000 unique quote numbers
         nextNumber = nextNumber.PadLeft(5, '0');
         // recreate the string - quote number must begin with 345BSL as per business rules
-        string quoteNumber = "345BSL" + numberPart;
+        string quoteNumber = "345BSL" + nextNumber;
         var quote = new Quote
         {
             UserId = 1, // placeholder
@@ -242,7 +242,7 @@ public class QuoteService
         // allows for 100,000 unique quote numbers
         nextNumber = nextNumber.PadLeft(5, '0');
         // recreate the string - quote number must begin with 345BSL as per business rules
-        string quoteNumber = "345BSL" + numberPart;
+        string quoteNumber = "345BSL" + nextNumber;
         var newQuote = new Quote
         {
             UserId = 1, // placeholder

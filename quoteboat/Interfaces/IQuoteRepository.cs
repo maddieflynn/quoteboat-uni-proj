@@ -11,4 +11,5 @@ public interface IQuoteRepository
     Task<Quote> CreateQuote(Quote quote);
     Task<Quote> UpdateQuote(Quote quote);
     Task DeleteQuote(int id);
+    Task<string?> GetLatestQuoteNumber();
 }

@@ -1,12 +1,32 @@
+using System.Data.SqlTypes;
+using Microsoft.EntityFrameworkCore;
+using quoteboat.Interfaces;
+using quoteboat.Repositories;
+using quoteboat.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// database connection
+var connection = String.Empty;
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+}
+else
+{
+    connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+}
+builder.Services.AddDbContext<QuoteBoatContext>(options =>
+    options.UseSqlServer(connection, sqlOptions => 
+    sqlOptions.EnableRetryOnFailure()));
+
 
 // Add services to the container.
 // swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// db context
-builder.Services.AddDbContext<QuoteBoatContext>();
 // scopes for repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
