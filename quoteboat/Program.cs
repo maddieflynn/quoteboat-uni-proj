@@ -30,6 +30,9 @@ builder.Services.AddDbContext<QuoteBoatContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// add controllers
+builder.Services.AddControllers();
+
 // scopes for repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
@@ -38,6 +41,7 @@ builder.Services.AddScoped<ISectionRepository, SectionRepository>();
 builder.Services.AddScoped<IQuoteItemRepository, QuoteItemRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
 
 // jwt auth
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
