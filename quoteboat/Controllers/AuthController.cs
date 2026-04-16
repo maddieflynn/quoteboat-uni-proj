@@ -1,3 +1,12 @@
+using Microsoft.AspNetCore.Mvc;
+using quoteboat.Interfaces;
+using quoteboat.Services;
+using quoteboat.Other; 
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+
 // https://medium.com/@rckks/jwt-authentication-with-bcrypt-password-hashing-in-net-core-8-a412cec0725c
 // https://medium.com/@MatinGhanbari/building-a-secure-api-with-asp-net-core-jwt-and-refresh-tokens-03dac37b4055
 [Route("api/auth")]
@@ -98,6 +107,12 @@ public class AuthController : ControllerBase
 
 public class LoginRequest
 {
-    public string Username { get; set; }
-    public string Password { get; set; }
+    public string Username { get; set; } = null!;
+    public string Password { get; set; } = null!;
+}
+
+public class TokenRequest
+{
+    public string AccessToken { get; set; } = null!;
+    public string RefreshToken { get; set; } = null!;
 }

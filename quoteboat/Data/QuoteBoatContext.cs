@@ -14,5 +14,6 @@ public class QuoteBoatContext : DbContext
     public DbSet<Section> Sections { get; set; } = null!;
     public DbSet<QuoteItem> QuoteItems { get; set; } = null!;
     public DbSet<Item> Items { get; set; } = null!;
+    public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 }
 

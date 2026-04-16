@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using quoteboat.Interfaces;
 using quoteboat.Repositories;
 using quoteboat.Data;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 

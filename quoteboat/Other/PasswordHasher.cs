@@ -1,4 +1,6 @@
 // https://medium.com/@rckks/jwt-authentication-with-bcrypt-password-hashing-in-net-core-8-a412cec0725c
+
+namespace quoteboat.Other;
 public static class PasswordHasher
 {
     public static string HashPassword(string password)
