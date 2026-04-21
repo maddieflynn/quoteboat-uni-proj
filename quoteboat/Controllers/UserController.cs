@@ -10,6 +10,7 @@ namespace quoteboat.Services;
 [Route("api/users")]
 [ApiController]
 [Authorize]
+
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;

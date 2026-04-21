@@ -9,6 +9,7 @@ namespace quoteboat.Controllers;
 [ApiController]
 // blank to allow for URLs like quotes/{id}/sections
 [Route("")]
+[Authorize]
 public class SectionController : ControllerBase
 {
     private readonly SectionService _sectionService;

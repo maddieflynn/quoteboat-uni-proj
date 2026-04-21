@@ -7,6 +7,7 @@ namespace quoteboat.Controllers;
 // controller syntax, attributes, from Microsoft Learn docs: https://learn.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-10.0
 [ApiController]
 [Route("clients")]
+[Authorize]
 // derive from ControllerBase, not Controller (the latter is for handling web pages not API requests)
 public class ClientController : ControllerBase
 {

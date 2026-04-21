@@ -7,6 +7,7 @@ namespace quoteboat.Controllers;
 // refer to ClientController and ClientService for comments on controller/service syntax & attributes
 [ApiController]
 [Route("items")]
+[Authorize]
 public class ItemController : ControllerBase
 {
     private readonly ItemService _itemService;
