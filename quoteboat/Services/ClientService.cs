@@ -9,9 +9,18 @@ public class ClientService
     // dependency injection - clientRepository
     private readonly IClientRepository _clientRepository;
 
-    public ClientService(IClientRepository clientRepository)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public ClientService(IClientRepository clientRepository, IHttpContextAccessor httpContextAccessor)
     {
         _clientRepository = clientRepository;
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public string? GetUserId()
+    // for source please see UserService.cs file
+    {
+        return _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(i => i.Type == JwtRegisteredClaimNames.Sub)?.Value;
     }
 
     // use DTOs instead of actual models as this is what the user is reading/accessing
@@ -71,9 +80,16 @@ public class ClientService
         }
         // create a new Client object
         // use DTO fields, repo will handle the rest
+
+        // get logged in user
+        var userId = GetUserId();
+        if (userId == null) 
+        {
+            return null;
+        }
         var client = new Client
         {
-            UserId = 1, // placeholder - will become the logged-in userId
+            UserId = int.Parse(userId),
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             PhysicalAddress = dto.PhysicalAddress,

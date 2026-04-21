@@ -4,14 +4,23 @@ using quoteboat.Dtos;
 
 namespace quoteboat.Services;
 
+
 // refer to ClientController and ClientService for comments on controller/service syntax & attributes
 public class ItemService
 {
     private readonly IItemRepository _itemRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ItemService(IItemRepository itemRepository)
+    public ItemService(IItemRepository itemRepository, IHttpContextAccessor httpContextAccessor)
     {
         _itemRepository = itemRepository;
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public string? GetUserId()
+    // for source please see UserService.cs file
+    {
+        return _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(i => i.Type == JwtRegisteredClaimNames.Sub)?.Value;
     }
 
     public async Task<List<ItemCruDto>> GetAllItems(string? filter, string? sort)
@@ -51,9 +60,14 @@ public class ItemService
 
     public async Task<ItemCruDto?> CreateItem(ItemCruDto dto)
     {
+        var userId = GetUserId();
+        if (userId == null) 
+        {
+            return null;
+        }
         var item = new Item
         {
-            UserId = 1, // placeholder
+            UserId = int.Parse(userId),
             Type = dto.Type,
             Name = dto.Name,
             SupplierName = dto.SupplierName,

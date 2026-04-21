@@ -4,6 +4,7 @@ using quoteboat.Dtos;
 
 namespace quoteboat.Services;
 
+
 // refer to ClientController and ClientService for comments on controller/service syntax & attributes
 public class QuoteService
 {
@@ -16,17 +17,26 @@ public class QuoteService
     private readonly IClientRepository _clientRepository;
     private readonly IUserRepository _userRepository;
     private readonly ISectionRepository _sectionRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public QuoteService(
         IQuoteRepository quoteRepository,
         IClientRepository clientRepository,
         IUserRepository userRepository,
-        ISectionRepository sectionRepository)
+        ISectionRepository sectionRepository,
+        IHttpContextAccessor httpContextAccessor)
     {
         _quoteRepository = quoteRepository;
         _clientRepository = clientRepository;
         _userRepository = userRepository;
         _sectionRepository = sectionRepository;
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public string? GetUserId()
+    // for source please see UserService.cs file
+    {
+        return _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(i => i.Type == JwtRegisteredClaimNames.Sub)?.Value;
     }
 
     public async Task<List<QuoteReadDto>> GetAllQuotes(string? filter, string? sort)
@@ -106,9 +116,14 @@ public class QuoteService
         nextNumber = nextNumber.PadLeft(5, '0');
         // recreate the string - quote number must begin with 345BSL as per business rules
         string quoteNumber = "345BSL" + nextNumber;
+        var userId = GetUserId();
+        if (userId == null) 
+        {
+            return null;
+        }
         var quote = new Quote
         {
-            UserId = 1, // placeholder
+            UserId = int.Parse(userId),
             ClientId = dto.ClientId,
             // use the recreated string as the new quote number
             QuoteNumber = quoteNumber,
@@ -243,9 +258,14 @@ public class QuoteService
         nextNumber = nextNumber.PadLeft(5, '0');
         // recreate the string - quote number must begin with 345BSL as per business rules
         string quoteNumber = "345BSL" + nextNumber;
+        var userId = GetUserId();
+        if (userId == null) 
+        {
+            return null;
+        }
         var newQuote = new Quote
         {
-            UserId = 1, // placeholder
+            UserId = int.Parse(userId),
             ClientId = dto.ClientId,
             QuoteNumber = quoteNumber,
             State = "DRAFT"

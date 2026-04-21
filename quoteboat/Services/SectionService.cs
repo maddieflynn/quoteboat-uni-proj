@@ -4,6 +4,7 @@ using quoteboat.Dtos;
 
 namespace quoteboat.Services;
 
+
 // refer to ClientController and ClientService for comments on controller/service syntax & attributes
 public class SectionService
 {
@@ -11,12 +12,20 @@ public class SectionService
     // this is to access information about the state of a quote in certain functions
     // i.e. to update a section, a quote must be in the DRAFT state
     private readonly ISectionRepository _sectionRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IQuoteRepository _quoteRepository;
 
-    public SectionService(ISectionRepository sectionRepository, IQuoteRepository quoteRepository)
+    public SectionService(ISectionRepository sectionRepository, IQuoteRepository quoteRepository, IHttpContextAccessor httpContextAccessor)
     {
         _sectionRepository = sectionRepository;
         _quoteRepository = quoteRepository;
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public string? GetUserId()
+    // for source please see UserService.cs file
+    {
+        return _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(i => i.Type == JwtRegisteredClaimNames.Sub)?.Value;
     }
 
     public async Task<SectionReadDto?> GetSectionById(int id)
@@ -62,10 +71,15 @@ public class SectionService
         {
             return null;
         }
+        var userId = GetUserId();
+        if (userId == null) 
+        {
+            return null;
+        }
         var section = new Section
         {
             QuoteId = quoteId,
-            UserId = 1, // placeholder
+            UserId = int.Parse(userId),
             Type = dto.Type,
             Name = dto.Name
         };
