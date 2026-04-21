@@ -44,6 +44,7 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 
 // jwt auth
+builder.Services.AddHttpContextAccessor();
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
