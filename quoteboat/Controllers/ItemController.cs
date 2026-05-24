@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using quoteboat.Services;
 using quoteboat.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace quoteboat.Controllers;
 
@@ -19,16 +20,16 @@ public class ItemController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<ItemCruDto>>> GetItems([FromQuery] string? filter, [FromQuery] string? sort)
+    public async Task<ActionResult<List<ItemReadDto>>> GetItems([FromQuery] string? filter, [FromQuery] string? sort, [FromQuery] string? status)
     {
-        var items = await _itemService.GetAllItems(filter, sort);
+        var items = await _itemService.GetAllItems(filter, sort, status);
         return Ok(items);
     }
 
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ItemCruDto>> GetItem(int id)
+    public async Task<ActionResult<ItemReadDto>> GetItem(int id)
     {
         var item = await _itemService.GetItemById(id);
         if (item == null)
@@ -40,7 +41,7 @@ public class ItemController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ItemCruDto>> CreateItem(ItemCruDto dto)
+    public async Task<ActionResult<ItemReadDto>> CreateItem(ItemCruDto dto)
     {
         var created = await _itemService.CreateItem(dto);
         // can't return CreatedAtAction as the DTO doesn't include ItemId
@@ -52,7 +53,7 @@ public class ItemController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ItemCruDto>> UpdateItem(int id, ItemCruDto dto)
+    public async Task<ActionResult<ItemReadDto>> UpdateItem(int id, ItemCruDto dto)
     {
         var updated = await _itemService.UpdateItem(id, dto);
         if (updated == null)

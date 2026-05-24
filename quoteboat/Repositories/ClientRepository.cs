@@ -17,18 +17,26 @@ public class ClientRepository : IClientRepository
     public async Task<Client?> GetClientById(int id)
     {
         // filter fpr active clients
-        return await _context.Clients.FirstOrDefaultAsync(c => c.ClientId == id && c.IsActive);
+        return await _context.Clients.FirstOrDefaultAsync(c => c.ClientId == id);
     }
 
     public async Task<Client?> GetClientByEmail(string email)
     {
         // filter for active clients
-        return await _context.Clients.FirstOrDefaultAsync(c => c.Email == email && c.IsActive);
+        return await _context.Clients.FirstOrDefaultAsync(c => c.Email == email);
     }
 
-    public async Task<List<Client>> GetAllClients(string? filter, string? sort)
+    public async Task<List<Client>> GetAllClients(string? filter, string? sort, string? status)
     {
-        var query = _context.Clients.Where(c => c.IsActive);
+        var query = _context.Clients.AsQueryable();
+        if (status == "active")
+        {
+            query = query.Where(c => c.IsActive);
+        }
+        else if (status == "inactive")
+        {
+            query = query.Where(c => !c.IsActive);
+        }
         // see comments in UserRepository for filtering and sorting
         if (!string.IsNullOrEmpty(filter))
         {

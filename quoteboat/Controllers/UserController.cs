@@ -13,18 +13,18 @@ namespace quoteboat.Services;
 
 public class UserController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IUserRepository _userRepository;
 
-    public UserController(IUserService userService)
+    public UserController(IUserRepository userRepository)
     {
-        _userService = userService;
+        _userRepository = userRepository;
     }
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<UserReadDto>>> GetUsers([FromQuery] string? filter, [FromQuery] string? sort)
+    public async Task<ActionResult<List<UserReadDto>>> GetUsers([FromQuery] string? filter, [FromQuery] string? sort, [FromQuery] string? status)
     {
-        var users = await _userService.GetAllUsers(filter, sort);
+        var users = await _userRepository.GetAllUsers(filter, sort, status);
         return Ok(users);
     }
 
@@ -33,7 +33,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserReadDto>> GetUser(int id)
     {
-        var user = await _userService.GetUserById(id);
+        var user = await _userRepository.GetUserById(id);
         if (user == null) return NotFound();
         return Ok(user);
     }
@@ -43,7 +43,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<UserReadDto>> CreateUser(UserCreateDto dto)
     {
-        var created = await _userService.CreateUser(dto);
+        var created = await _userRepository.CreateUser(dto);
         if (created == null)
         {
             return BadRequest("Unable to create as user with this email already exists.");
@@ -56,7 +56,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserReadDto>> UpdateUser(int id, UserUpdateDto dto)
     {
-        var user = await _userService.UpdateUser(id, dto);
+        var user = await _userRepository.UpdateUser(id, dto);
         if (user == null) return NotFound();
         return Ok(user);
     }
@@ -66,7 +66,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeactivateUser(int id)
     {
-        var success = await _userService.DeactivateUser(id);
+        var success = await _userRepository.DeactivateUser(id);
         if (!success)
         {
             return NotFound("Unable to deactivate as user not found.");
@@ -79,7 +79,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ReactivateUser(int id)
     {
-        var success = await _userService.ReactivateUser(id);
+        var success = await _userRepository.ReactivateUser(id);
         if (!success)
         {
             return NotFound("Unable to reactivate as user not found.");

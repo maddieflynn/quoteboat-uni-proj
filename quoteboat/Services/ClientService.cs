@@ -1,6 +1,8 @@
 using quoteboat.Interfaces;
 using quoteboat.Models;
 using quoteboat.Dtos;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace quoteboat.Services;
 
@@ -18,17 +20,17 @@ public class ClientService
     }
 
     public string? GetUserId()
-    // for source please see UserService.cs file
     {
-        return _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(i => i.Type == JwtRegisteredClaimNames.Sub)?.Value;
+        return _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
     }
 
     // use DTOs instead of actual models as this is what the user is reading/accessing
-    public async Task<List<ClientReadDto>> GetAllClients(string? filter, string? sort)
+    public async Task<List<ClientReadDto>> GetAllClients(string? filter, string? sort, string? status)
     {
         // LINQ query in the repo will search names, email with filter param
         // and will sort A-Z or Z-A or Newest-Oldest based on sort param
-        var clients = await _clientRepository.GetAllClients(filter, sort);
+        // status will determine if working with active or inactive or both
+        var clients = await _clientRepository.GetAllClients(filter, sort, status);
         // clients is a list of full Client objects - repo is just straight data from the database, no DTOs
         // create a list of DTOs instead, build that off the list of Client objects returned from the repo
         var result = new List<ClientReadDto>();
@@ -95,7 +97,7 @@ public class ClientService
             PhysicalAddress = dto.PhysicalAddress,
             Email = dto.Email,
             PhoneNumber = dto.PhoneNumber,
-            IsActive = dto.IsActive
+            IsActive = true
         };
         // call repo to add the new Client object to the database
         var created = await _clientRepository.CreateClient(client);
@@ -124,7 +126,6 @@ public class ClientService
         existing.PhysicalAddress = dto.PhysicalAddress;
         existing.Email = dto.Email;
         existing.PhoneNumber = dto.PhoneNumber;
-        existing.IsActive = dto.IsActive;
         var updated = await _clientRepository.UpdateClient(existing);
         return new ClientReadDto
         {

@@ -6,6 +6,7 @@ using quoteboat.Data;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using quoteboat.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +32,23 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // add controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        });
+
+// CORS config - React app
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
 
 // scopes for repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -41,12 +58,20 @@ builder.Services.AddScoped<ISectionRepository, SectionRepository>();
 builder.Services.AddScoped<IQuoteItemRepository, QuoteItemRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+// scopes for services
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ClientService>();
+builder.Services.AddScoped<QuoteService>();
+builder.Services.AddScoped<SectionService>();
+builder.Services.AddScoped<QuoteItemService>();
+builder.Services.AddScoped<ItemService>();
+builder.Services.AddScoped<JwtService>();
 
 
 // jwt auth
 builder.Services.AddHttpContextAccessor();
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+var secretKey = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -70,6 +95,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
+app.UseCors("AllowReact");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

@@ -1,6 +1,8 @@
 using quoteboat.Interfaces;
 using quoteboat.Models;
 using quoteboat.Dtos;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace quoteboat.Services;
 
@@ -23,9 +25,8 @@ public class SectionService
     }
 
     public string? GetUserId()
-    // for source please see UserService.cs file
     {
-        return _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(i => i.Type == JwtRegisteredClaimNames.Sub)?.Value;
+        return _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
     }
 
     public async Task<SectionReadDto?> GetSectionById(int id)
@@ -62,12 +63,12 @@ public class SectionService
         return result;
     }
 
-    public async Task<SectionCreateUpdateDto?> AddSectionToQuote(int quoteId, SectionCreateUpdateDto dto)
+    public async Task<SectionReadDto?> AddSectionToQuote(int quoteId, SectionCreateUpdateDto dto)
     {
         var quote = await _quoteRepository.GetQuoteById(quoteId);
         // cannot add section to a non-existent quote
         // cannot add section to a quote that is not in DRAFT state
-        if (quote == null || quote.State != "DRAFT")
+        if (quote == null || quote.State != "Draft")
         {
             return null;
         }
@@ -84,14 +85,15 @@ public class SectionService
             Name = dto.Name
         };
         var created = await _sectionRepository.CreateSection(section);
-        return new SectionCreateUpdateDto
+        return new SectionReadDto
         {
+            SectionId = created.SectionId,
             Type = created.Type,
             Name = created.Name
         };
     }
 
-    public async Task<SectionCreateUpdateDto?> UpdateSection(int id, SectionCreateUpdateDto dto)
+    public async Task<SectionReadDto?> UpdateSection(int id, SectionCreateUpdateDto dto)
     {
         var existing = await _sectionRepository.GetSectionById(id);
         if (existing == null)
@@ -100,15 +102,16 @@ public class SectionService
         }
         // same as above
         var quote = await _quoteRepository.GetQuoteById(existing.QuoteId);
-        if (quote == null || quote.State != "DRAFT")
+        if (quote == null || quote.State != "Draft")
         {
             return null;
         }
         existing.Type = dto.Type;
         existing.Name = dto.Name;
         var updated = await _sectionRepository.UpdateSection(existing);
-        return new SectionCreateUpdateDto
+        return new SectionReadDto
         {
+            SectionId = updated.SectionId,
             Type = updated.Type,
             Name = updated.Name
         };
@@ -123,7 +126,7 @@ public class SectionService
         }
         // same as above
         var quote = await _quoteRepository.GetQuoteById(existing.QuoteId);
-        if (quote == null || quote.State != "DRAFT")
+        if (quote == null || quote.State != "Draft")
         {
             return false;
         }

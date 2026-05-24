@@ -2,10 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using quoteboat.Interfaces;
 using quoteboat.Services;
 using quoteboat.Other; 
+using quoteboat.Dtos;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
+using quoteboat.Models;
 
 // https://medium.com/@rckks/jwt-authentication-with-bcrypt-password-hashing-in-net-core-8-a412cec0725c
 // https://medium.com/@MatinGhanbari/building-a-secure-api-with-asp-net-core-jwt-and-refresh-tokens-03dac37b4055
@@ -53,8 +56,8 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Refresh([FromBody] TokenRequest request)
     {
         var principal = GetPrincipalFromExpiredToken(request.AccessToken);
-        var userId = int.Parse(principal.FindFirst(JwtRegisteredClaimNames.Sub).Value);
-        var username = principal.FindFirst(JwtRegisteredClaimNames.UniqueName).Value;
+        var userId = int.Parse(principal.FindFirst(JwtRegisteredClaimNames.Sub)!.Value);
+        var username = principal.FindFirst(JwtRegisteredClaimNames.UniqueName)!.Value;
 
         var savedRefreshToken = await _refreshTokenRepository.GetRefreshToken(username, request.RefreshToken);
         if (savedRefreshToken == null || savedRefreshToken.IsRevoked || savedRefreshToken.ExpiryDate <= DateTime.UtcNow)
@@ -88,7 +91,7 @@ public class AuthController : ControllerBase
             ValidIssuer = jwtSettings["Issuer"],
             ValidAudience = jwtSettings["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings["Key"])
+                Encoding.UTF8.GetBytes(jwtSettings["Key"]!)
             )
         };
 
@@ -102,6 +105,17 @@ public class AuthController : ControllerBase
         }
 
         return principal;
+    }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(UserCreateDto dto)
+    {
+        var createdUser = await _userRepository.CreateUser(dto);
+        if (createdUser == null)
+        {
+            return BadRequest("Email already exists.");
+        }
+        return Ok(createdUser);
     }
 }
 

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using quoteboat.Services;
 using quoteboat.Dtos;
 using System.Runtime.Versioning;
+using Microsoft.AspNetCore.Authorization;
 
 namespace quoteboat.Controllers;
 
@@ -43,7 +44,7 @@ public class SectionController : ControllerBase
     [HttpPost("quotes/{id}/sections")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<SectionCreateUpdateDto>> AddSection(int id, SectionCreateUpdateDto dto)
+    public async Task<ActionResult<SectionReadDto>> AddSection(int id, SectionCreateUpdateDto dto)
     {
         var created = await _sectionService.AddSectionToQuote(id, dto);
         if (created == null)
@@ -56,7 +57,7 @@ public class SectionController : ControllerBase
     [HttpPut("sections/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<SectionCreateUpdateDto>> UpdateSection(int id, SectionCreateUpdateDto dto)
+    public async Task<ActionResult<SectionReadDto>> UpdateSection(int id, SectionCreateUpdateDto dto)
     {
         var updated = await _sectionService.UpdateSection(id, dto);
         if (updated == null)

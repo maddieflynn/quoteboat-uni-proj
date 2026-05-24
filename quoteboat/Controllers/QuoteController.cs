@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using quoteboat.Services;
 using quoteboat.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace quoteboat.Controllers;
 
@@ -106,9 +107,9 @@ public class QuoteController : ControllerBase
     }
 
     [HttpPost("{id}/clone")]
-    public async Task<ActionResult<QuoteReadDto>> CloneQuote(int id, QuoteCreateCloneDto dto)
+    public async Task<ActionResult<QuoteReadDto>> CloneQuote(int id)
     {
-        var cloned = await _quoteService.CloneQuote(id, dto);
+        var cloned = await _quoteService.CloneQuote(id);
         if (cloned == null)
         {
             return NotFound("Unable to clone as quote not found.");

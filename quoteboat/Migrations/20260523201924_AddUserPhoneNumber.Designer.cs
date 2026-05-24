@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using quoteboat.Data;
 
@@ -11,9 +12,11 @@ using quoteboat.Data;
 namespace quoteboat.Migrations
 {
     [DbContext(typeof(QuoteBoatContext))]
-    partial class QuoteBoatContextModelSnapshot : ModelSnapshot
+    [Migration("20260523201924_AddUserPhoneNumber")]
+    partial class AddUserPhoneNumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

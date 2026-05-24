@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using quoteboat.Services;
 using quoteboat.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace quoteboat.Controllers;
 
@@ -29,9 +30,9 @@ public class ClientController : ControllerBase
     // ALSO, the return type is a List of ClientReadDto - NOT Client objects
     // this is what the frontend receives, therefore you limit it to what you want displayed/accessible from the UI
     // This is why DTOs were defined, so use them
-    public async Task<ActionResult<List<ClientReadDto>>> GetClients([FromQuery] string? filter, [FromQuery] string? sort)
+    public async Task<ActionResult<List<ClientReadDto>>> GetClients([FromQuery] string? filter, [FromQuery] string? sort, [FromQuery] string? status)
     {
-        var clients = await _clientService.GetAllClients(filter, sort);
+        var clients = await _clientService.GetAllClients(filter, sort, status);
         // returns a 200 response code + the object (in this case a list of ClientReadDtos)
         return Ok(clients); // if list is empty, this will be handled by the frontend 
                             // so one response code is sufficient 

@@ -3,6 +3,7 @@ using quoteboat.Dtos;
 using quoteboat.Models;
 using quoteboat.Other;
 using quoteboat.Repositories;
+using quoteboat.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace quoteboat.Services;
@@ -11,11 +12,11 @@ namespace quoteboat.Services;
 
 public class UserService
 {
-    private readonly UserRepository _userRepository;
+    private readonly IUserRepository _userRepository;
     // source: https://stackoverflow.com/questions/50580232/get-userid-from-jwt-on-all-controller-methods [Larissa Savchekoo]
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public UserService(UserRepository userRepository, IHttpContextAccessor httpContextAccessor)
+    public UserService(IUserRepository  userRepository, IHttpContextAccessor httpContextAccessor)
     {
         _userRepository = userRepository;
         _httpContextAccessor = httpContextAccessor;
@@ -27,9 +28,9 @@ public class UserService
         return _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(i => i.Type == JwtRegisteredClaimNames.Sub)?.Value;
     }
 
-    public async Task<List<UserReadDto>> GetAllUsers(string? filter, string? sort)
+    public async Task<List<UserReadDto>> GetAllUsers(string? filter, string? sort, string? status)
     {
-        var users = await _userRepository.GetAllUsers(filter, sort);
+        var users = await _userRepository.GetAllUsers(filter, sort, status);
         var result = new List<UserReadDto>();
         foreach (var u in users)
         {
@@ -39,6 +40,7 @@ public class UserService
                 FirstName = u.FirstName,
                 LastName = u.LastName,
                 Email = u.Email,
+                PhoneNumber = u.PhoneNumber,
                 IsActive = u.IsActive
             });
         }
@@ -55,6 +57,7 @@ public class UserService
             FirstName = user.FirstName,
             LastName = user.LastName,
             Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
             IsActive = user.IsActive
         };
     }
@@ -66,21 +69,14 @@ public class UserService
         {
             return null;
         }
-        var user = new User
-        {
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            Email = dto.Email,
-            PasswordHash = PasswordHasher.HashPassword(dto.Password),
-            IsActive = true
-        };
-        var created = await _userRepository.CreateUser(user);
+        var created = await _userRepository.CreateUser(dto);
         return new UserReadDto
         {
             UserId = created.UserId,
             FirstName = created.FirstName,
             LastName = created.LastName,
             Email = created.Email,
+            PhoneNumber = created.PhoneNumber,
             IsActive = created.IsActive
         };
     }
@@ -106,14 +102,16 @@ public class UserService
         user.FirstName = dto.FirstName;
         user.LastName = dto.LastName;
         user.Email = dto.Email;
+        user.PhoneNumber = dto.PhoneNumber;
         user.IsActive = dto.IsActive;
-        var updated = await _userRepository.UpdateUser(user);
+        var updated = await _userRepository.UpdateUser(id, dto);
         return new UserReadDto
         {
             UserId = updated.UserId,
             FirstName = updated.FirstName,
             LastName = updated.LastName,
             Email = updated.Email,
+            PhoneNumber = updated.PhoneNumber,
             IsActive = updated.IsActive
         };
     }
@@ -126,7 +124,15 @@ public class UserService
             return false;
         }
         user.IsActive = false;
-        await _userRepository.UpdateUser(user);
+        var dto = new UserUpdateDto
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            IsActive = false
+        };
+        await _userRepository.UpdateUser(id, dto);
         return true;
     }
 
@@ -138,7 +144,15 @@ public class UserService
             return false;
         }
         user.IsActive = true;
-        await _userRepository.UpdateUser(user);
+        var dto = new UserUpdateDto
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            IsActive = true
+        };
+        await _userRepository.UpdateUser(id, dto);
         return true;
     }
 }

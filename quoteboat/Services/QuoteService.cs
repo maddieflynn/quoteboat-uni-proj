@@ -1,6 +1,8 @@
 using quoteboat.Interfaces;
 using quoteboat.Models;
 using quoteboat.Dtos;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace quoteboat.Services;
 
@@ -34,9 +36,8 @@ public class QuoteService
     }
 
     public string? GetUserId()
-    // for source please see UserService.cs file
     {
-        return _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(i => i.Type == JwtRegisteredClaimNames.Sub)?.Value;
+        return _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
     }
 
     public async Task<List<QuoteReadDto>> GetAllQuotes(string? filter, string? sort)
@@ -127,7 +128,7 @@ public class QuoteService
             ClientId = dto.ClientId,
             // use the recreated string as the new quote number
             QuoteNumber = quoteNumber,
-            State = "DRAFT"
+            State = "Draft"
         };
         var created = await _quoteRepository.CreateQuote(quote);
         var client = await _clientRepository.GetClientById(created.ClientId);
@@ -151,7 +152,7 @@ public class QuoteService
         var existing = await _quoteRepository.GetQuoteById(id);
         // cannot update a non-existent quote
         // cannot update a quote unless it is in the DRAFT state
-        if (existing == null || existing.State != "DRAFT")
+        if (existing == null || existing.State != "Draft")
         {
             return null;
         }
@@ -177,7 +178,7 @@ public class QuoteService
     {
         var existing = await _quoteRepository.GetQuoteById(id);
         // same as above
-        if (existing == null || existing.State != "DRAFT")
+        if (existing == null || existing.State != "Draft")
         {
             return false;
         }
@@ -189,7 +190,7 @@ public class QuoteService
     {
         var quote = await _quoteRepository.GetQuoteById(id);
         // DRAFT -> SENT is the valid state transition
-        if (quote == null || quote.State != "DRAFT")
+        if (quote == null || quote.State != "Draft")
         {
             return false;
         }
@@ -199,7 +200,7 @@ public class QuoteService
         {
             return false;
         }
-        quote.State = "SENT";
+        quote.State = "Sent";
         await _quoteRepository.UpdateQuote(quote);
         return true;
     }
@@ -208,11 +209,11 @@ public class QuoteService
     {
         var quote = await _quoteRepository.GetQuoteById(id);
         // SENT -> ACCEPTED is the valid state transition
-        if (quote == null || quote.State != "SENT")
+        if (quote == null || quote.State != "Sent")
         {
             return false;
         }
-        quote.State = "ACCEPTED";
+        quote.State = "Accepted";
         await _quoteRepository.UpdateQuote(quote);
         return true;
     }
@@ -221,16 +222,16 @@ public class QuoteService
     {
         var quote = await _quoteRepository.GetQuoteById(id);
         // SENT -> REJECTED is the valid state transition
-        if (quote == null || quote.State != "SENT")
+        if (quote == null || quote.State != "Sent")
         {
             return false;
         }
-        quote.State = "REJECTED";
+        quote.State = "Rejected";
         await _quoteRepository.UpdateQuote(quote);
         return true;
     }
 
-    public async Task<QuoteReadDto?> CloneQuote(int id, QuoteCreateCloneDto dto)
+    public async Task<QuoteReadDto?> CloneQuote(int id)
     {
         var original = await _quoteRepository.GetQuoteById(id);
         // cannot clone a non-existent quote
@@ -266,9 +267,9 @@ public class QuoteService
         var newQuote = new Quote
         {
             UserId = int.Parse(userId),
-            ClientId = dto.ClientId,
+            ClientId = original.ClientId,
             QuoteNumber = quoteNumber,
-            State = "DRAFT"
+            State = "Draft"
         };
         // create the new quote
         var createdQuote = await _quoteRepository.CreateQuote(newQuote);

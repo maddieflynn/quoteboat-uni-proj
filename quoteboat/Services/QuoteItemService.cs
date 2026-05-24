@@ -1,6 +1,7 @@
 using quoteboat.Interfaces;
 using quoteboat.Models;
 using quoteboat.Dtos;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace quoteboat.Services;
 
@@ -42,7 +43,9 @@ public class QuoteItemService
             }
             result.Add(new QuoteItemReadDto
             {
+                QuoteItemId = qi.QuoteItemId,
                 ItemId = qi.ItemId,
+                SectionId = qi.SectionId,
                 ItemName = item.Name,
                 Type = item.Type,
                 SupplierName = item.SupplierName,
@@ -67,7 +70,7 @@ public class QuoteItemService
             return null;
         }
         var quote = await _quoteRepository.GetQuoteById(section.QuoteId);
-        if (quote == null || quote.State != "DRAFT")
+        if (quote == null || quote.State != "Draft")
         {
             return null;
         }
@@ -86,7 +89,9 @@ public class QuoteItemService
         var created = await _quoteItemRepository.CreateQuoteItem(quoteItem);
         return new QuoteItemReadDto
         {
+            QuoteItemId = created.QuoteItemId,
             ItemId = created.ItemId,
+            SectionId = created.SectionId,
             ItemName = item.Name,
             Type = item.Type,
             SupplierName = item.SupplierName,
@@ -114,7 +119,7 @@ public class QuoteItemService
             return null;
         }
         var quote = await _quoteRepository.GetQuoteById(section.QuoteId);
-        if (quote == null || quote.State != "DRAFT")
+        if (quote == null || quote.State != "Draft")
         {
             return null;
         }
@@ -123,7 +128,9 @@ public class QuoteItemService
         var item = await _itemRepository.GetItemById(updated.ItemId);
         return new QuoteItemReadDto
         {
+            QuoteItemId = updated.QuoteItemId,
             ItemId = updated.ItemId,
+            SectionId = updated.SectionId,
             ItemName = item!.Name,
             Type = item.Type,
             SupplierName = item.SupplierName,
@@ -146,7 +153,7 @@ public class QuoteItemService
             return false;
         }
         var quote = await _quoteRepository.GetQuoteById(section.QuoteId);
-        if (quote == null || quote.State != "DRAFT")
+        if (quote == null || quote.State != "Draft")
         {
             return false;
         }

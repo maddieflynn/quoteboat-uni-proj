@@ -17,13 +17,20 @@ public class ItemRepository : IItemRepository
     public async Task<Item?> GetItemById(int id)
     {
         // filter for active items
-        return await _context.Items.FirstOrDefaultAsync(i => i.ItemId == id && i.IsActive);
+        return await _context.Items.FirstOrDefaultAsync(i => i.ItemId == id);
     }
 
-    public async Task<List<Item>> GetAllItems(string? filter, string? sort)
+    public async Task<List<Item>> GetAllItems(string? filter, string? sort, string? status)
     {
-        // filter for active items
-        var query = _context.Items.Where(i => i.IsActive);
+        var query = _context.Items.AsQueryable();
+        if (status == "active")
+        {
+            query = query.Where(i => i.IsActive);
+        }
+        else if (status == "inactive")
+        {
+            query = query.Where(i => !i.IsActive);
+        }
         // users can filter by item Name, SupplierName, or Type
         if (!string.IsNullOrEmpty(filter))
         {

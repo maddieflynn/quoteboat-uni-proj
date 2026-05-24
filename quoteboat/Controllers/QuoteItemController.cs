@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using quoteboat.Services;
 using quoteboat.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace quoteboat.Controllers;
 

@@ -1,6 +1,8 @@
 using quoteboat.Interfaces;
 using quoteboat.Models;
 using quoteboat.Dtos;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace quoteboat.Services;
 
@@ -18,19 +20,19 @@ public class ItemService
     }
 
     public string? GetUserId()
-    // for source please see UserService.cs file
     {
-        return _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(i => i.Type == JwtRegisteredClaimNames.Sub)?.Value;
+        return _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
     }
 
-    public async Task<List<ItemCruDto>> GetAllItems(string? filter, string? sort)
+    public async Task<List<ItemReadDto>> GetAllItems(string? filter, string? sort, string? status)
     {
-        var items = await _itemRepository.GetAllItems(filter, sort);
-        var result = new List<ItemCruDto>();
+        var items = await _itemRepository.GetAllItems(filter, sort, status);
+        var result = new List<ItemReadDto>();
         foreach (var i in items)
         {
-            result.Add(new ItemCruDto
+            result.Add(new ItemReadDto
             {
+                ItemId = i.ItemId,
                 Type = i.Type,
                 Name = i.Name,
                 SupplierName = i.SupplierName,
@@ -41,15 +43,16 @@ public class ItemService
         return result;
     }
 
-    public async Task<ItemCruDto?> GetItemById(int id)
+    public async Task<ItemReadDto?> GetItemById(int id)
     {
         var item = await _itemRepository.GetItemById(id);
         if (item == null)
         {
             return null;
         }
-        return new ItemCruDto
+        return new ItemReadDto
         {
+            ItemId = item.ItemId,
             Type = item.Type,
             Name = item.Name,
             SupplierName = item.SupplierName,
@@ -58,9 +61,10 @@ public class ItemService
         };
     }
 
-    public async Task<ItemCruDto?> CreateItem(ItemCruDto dto)
+    public async Task<ItemReadDto?> CreateItem(ItemCruDto dto)
     {
         var userId = GetUserId();
+        Console.WriteLine(userId);
         if (userId == null) 
         {
             return null;
@@ -75,8 +79,9 @@ public class ItemService
             IsActive = dto.IsActive
         };
         var created = await _itemRepository.CreateItem(item);
-        return new ItemCruDto
+        return new ItemReadDto
         {
+            ItemId = created.ItemId,
             Type = created.Type,
             Name = created.Name,
             SupplierName = created.SupplierName,
@@ -85,7 +90,7 @@ public class ItemService
         };
     }
 
-    public async Task<ItemCruDto?> UpdateItem(int id, ItemCruDto dto)
+    public async Task<ItemReadDto?> UpdateItem(int id, ItemCruDto dto)
     {
         var existing = await _itemRepository.GetItemById(id);
         if (existing == null)
@@ -96,10 +101,10 @@ public class ItemService
         existing.Name = dto.Name;
         existing.SupplierName = dto.SupplierName;
         existing.UnitPrice = dto.UnitPrice;
-        existing.IsActive = dto.IsActive;
         var updated = await _itemRepository.UpdateItem(existing);
-        return new ItemCruDto
+        return new ItemReadDto
         {
+            ItemId = updated.ItemId,
             Type = updated.Type,
             Name = updated.Name,
             SupplierName = updated.SupplierName,
