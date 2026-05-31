@@ -62,7 +62,9 @@ public class QuoteService
                 ClientLastName = client.LastName,
                 ClientPhysicalAddress = client.PhysicalAddress,
                 UserFirstName = user.FirstName,
-                UserLastName = user.LastName
+                UserLastName = user.LastName,
+                UserEmail = user.Email,
+                UserPhoneNumber = user.PhoneNumber
             });
         }
         return result;
@@ -143,7 +145,9 @@ public class QuoteService
             ClientLastName = client.LastName,
             ClientPhysicalAddress = client.PhysicalAddress,
             UserFirstName = user!.FirstName,
-            UserLastName = user.LastName
+            UserLastName = user.LastName,
+            UserEmail = user.Email,
+            UserPhoneNumber = user.PhoneNumber
         };
     }
 
@@ -170,7 +174,9 @@ public class QuoteService
             ClientLastName = client.LastName,
             ClientPhysicalAddress = client.PhysicalAddress,
             UserFirstName = user!.FirstName,
-            UserLastName = user.LastName
+            UserLastName = user.LastName,
+            UserEmail = user.Email,
+            UserPhoneNumber = user.PhoneNumber
         };
     }
 
@@ -285,7 +291,9 @@ public class QuoteService
             ClientLastName = client.LastName,
             ClientPhysicalAddress = client.PhysicalAddress,
             UserFirstName = user!.FirstName,
-            UserLastName = user.LastName
+            UserLastName = user.LastName,
+            UserEmail = user.Email,
+            UserPhoneNumber = user.PhoneNumber
         };
     }
 }

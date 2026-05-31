@@ -11,4 +11,6 @@ public class QuoteReadDto
     public string ClientPhysicalAddress { get; set; } = null!;
     public string UserFirstName { get; set; } = null!;
     public string UserLastName { get; set; } = null!;
+    public string UserEmail { get; set; } = null!;
+    public string UserPhoneNumber { get; set; } = null!;
 }
