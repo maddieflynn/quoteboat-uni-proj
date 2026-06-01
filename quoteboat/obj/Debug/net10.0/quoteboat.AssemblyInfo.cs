@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("quoteboat")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+af54031e26fa0c61c274bfd9575f674087983b8f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6404b7185ee1a52d1d2f27f87ff25079e179162b")]
 [assembly: System.Reflection.AssemblyProductAttribute("quoteboat")]
 [assembly: System.Reflection.AssemblyTitleAttribute("quoteboat")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
